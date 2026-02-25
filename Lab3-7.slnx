@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="BitStream/BitStream.vcxproj" Id="d7a03aea-6052-4fe6-9f3a-adb5980960c1" />
+  <Project Path="BWTorMTF/BWTorMTF.vcxproj" Id="9803164b-f3c3-441d-93ee-ffcbd5ae3d67" />
+  <Project Path="Huffman/Huffman.vcxproj" Id="f813a0bb-2615-48d4-9cf5-a9f7ca91fa11" />
+  <Project Path="LZW/LZW.vcxproj" Id="879edc41-70fa-4c09-ab51-abaefcde6b5e" />
+</Solution>
