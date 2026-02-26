@@ -34,7 +34,7 @@ std::expected<void, SplittingError> TransformSplitting::ApplyForward(
         if (use_bwt) {
             auto bwt_res = BWT::Encode(current_span, bwt_index);
             if (!bwt_res) {
-                std::println(stderr, "BWT Encode Error: {}", TransformError_to_string(bwt_res.error()));
+                std::println(stderr, "Splitting Error: {}", SplittingError_to_string(SplittingError::TransformFailed));
                 return std::unexpected(SplittingError::TransformFailed);
             }
             transformed = std::move(bwt_res.value());
@@ -43,7 +43,7 @@ std::expected<void, SplittingError> TransformSplitting::ApplyForward(
         if (use_mtf) {
             auto mtf_res = MTF::Encode(current_span);
             if (!mtf_res) {
-                std::println(stderr, "MTF Encode Error: {}", TransformError_to_string(mtf_res.error()));
+                std::println(stderr, "Splitting Error: {}", SplittingError_to_string(SplittingError::TransformFailed));
                 return std::unexpected(SplittingError::TransformFailed);
             }
             transformed = std::move(mtf_res.value());
@@ -88,7 +88,7 @@ std::expected<void, SplittingError> TransformSplitting::ApplyReverse(
         if (use_mtf) {
             auto mtf_res = MTF::Decode(current_span);
             if (!mtf_res) {
-                std::println(stderr, "MTF Decode Error: {}", TransformError_to_string(mtf_res.error()));
+                std::println(stderr, "Splitting Error: {}", SplittingError_to_string(SplittingError::TransformFailed));
                 return std::unexpected(SplittingError::TransformFailed);
             }
             restored = std::move(mtf_res.value());
@@ -97,7 +97,7 @@ std::expected<void, SplittingError> TransformSplitting::ApplyReverse(
         if (use_bwt) {
             auto bwt_res = BWT::Decode(current_span, bwt_index);
             if (!bwt_res) {
-                std::println(stderr, "BWT Decode Error: {}", TransformError_to_string(bwt_res.error()));
+                std::println(stderr, "Splitting Error: {}", SplittingError_to_string(SplittingError::TransformFailed));
                 return std::unexpected(SplittingError::TransformFailed);
             }
             restored = std::move(bwt_res.value());
