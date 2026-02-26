@@ -82,7 +82,7 @@ std::expected<HuffmanStats, HuffmanError> HuffmanCoder::Compress(
     if (!in) return std::unexpected(HuffmanError::FileNotFound);
 
     std::array<uint32_t, 256> freqs = { 0 };
-    std::vector<char> buf(256 * 1024);
+    std::vector<char> buf(2048 * 1024);
     uint32_t total_bytes = 0;
     uint32_t unique_count = 0;
 
