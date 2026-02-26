@@ -8,6 +8,8 @@ enum class SplittingError {
     TransformFailed
 };
 
+std::string_view SplittingError_to_string(SplittingError err);
+
 class TransformSplitting {
     public:
         static constexpr size_t BLOCK_SIZE = 256 * 1024;

@@ -2,19 +2,22 @@
 #include <numeric>
 #include <algorithm>
 #include <array>
+#include <iostream>
+#include <print>
 
 std::string_view TransformError_to_string(TransformError err) {
     switch (err) {
-    case TransformError::EmptyInput:
-        return "Порожній вхідний блок для перетворення.";
-    case TransformError::InvalidIndex:
-        return "Некоректний primary index для зворотного BWT.";
-    default: return "Невідома помилка перетворення.";
+    case TransformError::EmptyInput:   return "Порожній вхідний блок для перетворення.";
+    case TransformError::InvalidIndex: return "Некоректний index для зворотного BWT.";
+    default:                           return "Невідома помилка перетворення.";
     }
 }
 
 std::expected<std::vector<uint8_t>, TransformError> BWT::Encode(std::span<const uint8_t> input, uint32_t& out_primary_index) {
-    if (input.empty()) return std::unexpected(TransformError::EmptyInput);
+    if (input.empty()) {
+        std::println(stderr, "BWT Encode Error: {}", TransformError_to_string(TransformError::EmptyInput));
+        return std::unexpected(TransformError::EmptyInput);
+    }
     if (input.size() == 1) {
         out_primary_index = 0;
         return std::vector<uint8_t>{input[0]};
@@ -65,10 +68,15 @@ std::expected<std::vector<uint8_t>, TransformError> BWT::Encode(std::span<const 
 }
 
 std::expected<std::vector<uint8_t>, TransformError> BWT::Decode(std::span<const uint8_t> input, uint32_t primary_index) {
-    if (input.empty()) return std::unexpected(TransformError::EmptyInput);
-
+    if (input.empty()) {
+		std::println(stderr, "BWT Decode Error: {}", TransformError_to_string(TransformError::EmptyInput));
+        return std::unexpected(TransformError::EmptyInput);
+    }
     const uint32_t N = static_cast<uint32_t>(input.size());
-    if (primary_index >= N) return std::unexpected(TransformError::InvalidIndex);
+    if (primary_index >= N) {
+		std::println(stderr, "BWT Decode Error: {}", TransformError_to_string(TransformError::InvalidIndex));
+        return std::unexpected(TransformError::InvalidIndex);
+    }
 
     std::vector<uint32_t> counts(256, 0);
     for (uint8_t c : input) counts[c]++;
@@ -95,7 +103,10 @@ std::expected<std::vector<uint8_t>, TransformError> BWT::Decode(std::span<const 
 }
 
 std::expected<std::vector<uint8_t>, TransformError> MTF::Encode(std::span<const uint8_t> input) {
-    if (input.empty()) return std::unexpected(TransformError::EmptyInput);
+    if (input.empty()) {
+		std::println(stderr, "MTF Encode Error: {}", TransformError_to_string(TransformError::EmptyInput));
+        return std::unexpected(TransformError::EmptyInput);
+    }
     std::vector<uint8_t> output(input.size());
     std::array<uint8_t, 256> alphabet;
     std::iota(alphabet.begin(), alphabet.end(), 0);
@@ -113,7 +124,10 @@ std::expected<std::vector<uint8_t>, TransformError> MTF::Encode(std::span<const 
 }
 
 std::expected<std::vector<uint8_t>, TransformError> MTF::Decode(std::span<const uint8_t> input) {
-    if (input.empty()) return std::unexpected(TransformError::EmptyInput);
+    if (input.empty()) {
+		std::println(stderr, "MTF Decode Error: {}", TransformError_to_string(TransformError::EmptyInput));
+        return std::unexpected(TransformError::EmptyInput);
+    }
     std::vector<uint8_t> output(input.size());
     std::array<uint8_t, 256> alphabet;
     std::iota(alphabet.begin(), alphabet.end(), 0);

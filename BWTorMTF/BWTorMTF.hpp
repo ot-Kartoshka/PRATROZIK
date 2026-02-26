@@ -11,6 +11,8 @@ enum class TransformError {
     InvalidIndex
 };
 
+std::string_view TransformError_to_string(TransformError err);
+
 class BWT {
 public:
     static std::expected<std::vector<uint8_t>, TransformError> Encode(std::span<const uint8_t> input, uint32_t& out_primary_index);

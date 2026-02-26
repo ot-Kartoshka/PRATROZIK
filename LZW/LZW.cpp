@@ -27,6 +27,7 @@ std::string_view LZWError_to_string(LZWError err) {
     case LZWError::LovHighMaxBit:   return "Некоректне значення max_bits. Дозволено діапазон 9-32 бітів.";
     case LZWError::NoMaxBit:        return "Не вказано значення max_bits після --max-bits.";
     case LZWError::TransformFailed: return "Помилка конвеєра перетворень BWT/MTF.";
+    case LZWError::NoPathProvided:  return "Не вказано шлях до файлу.";
     default:                        return "Невідома помилка.";
     }
 }

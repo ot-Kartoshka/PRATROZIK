@@ -24,6 +24,7 @@ std::string_view HuffmanError_to_string(HuffmanError err) {
     case HuffmanError::UserCancelled:   return "Операцію скасовано користувачем.";
     case HuffmanError::FileSameAsInput: return "Вихідний файл не може бути тим самим, що і вхідний.";
     case HuffmanError::TransformFailed: return "Помилка при застосуванні перетворень BWT/MTF.";
+	case HuffmanError::NoPathProvided:  return "Не вказано шлях до файлу.";
     default:                            return "Сталася невідома помилка при роботі з архіватором.";
     }
 }

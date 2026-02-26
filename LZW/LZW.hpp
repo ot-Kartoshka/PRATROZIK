@@ -32,7 +32,8 @@ enum class LZWError {
     EmptyFile,
     LovHighMaxBit,
     NoMaxBit,
-    TransformFailed
+    TransformFailed,
+    NoPathProvided
 };
 
 std::string_view LZWError_to_string(LZWError err);

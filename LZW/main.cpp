@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (in_file.empty()) {
-        std::println(stderr, "Error: Input file not specified.");
+        std::println(stderr, "Error: {}", LZWError_to_string(LZWError::NoPathProvided));
         PrintHelp(argv[0]);
         return 1;
     }

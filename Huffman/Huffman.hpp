@@ -23,6 +23,7 @@ enum class HuffmanError {
     UserCancelled,
     FileSameAsInput,
     EmptyFile,
+	NoPathProvided,
     TransformFailed 
 };
 

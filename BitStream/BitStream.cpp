@@ -1,13 +1,15 @@
 ﻿#include "../BitStream/BitStream.hpp"
 #include <algorithm>
+#include <iostream>
+#include <print>
 
 std::string_view error_to_string(BitStreamError err) {
     switch (err) {
-    case BitStreamError::EndOfFile: return "Досягнуто кінець потоку.";
-    case BitStreamError::WriteError: return "Помилка запису в потік.";
-    case BitStreamError::ReadError: return "Помилка читання з пристрою.";
+    case BitStreamError::EndOfFile:      return "Досягнуто кінець потоку.";
+    case BitStreamError::WriteError:     return "Помилка запису в потік.";
+    case BitStreamError::ReadError:      return "Помилка читання з пристрою.";
     case BitStreamError::BufferTooSmall: return "Буфер замалий для такої кількості бітів.";
-    default: return "Невідома помилка.";
+    default:                             return "Невідома помилка.";
     }
 }
 
@@ -20,7 +22,10 @@ BitWriter::~BitWriter() {
 std::expected<void, BitStreamError> BitWriter::Flush() {
     if (bit_pos_ > 0) {
         out_.put(static_cast<char>(current_byte_));
-        if (out_.fail()) return std::unexpected(BitStreamError::WriteError);
+        if (out_.fail()) {
+            std::println(stderr, "BitWriter Flush Error: {}", error_to_string(BitStreamError::WriteError));
+            return std::unexpected(BitStreamError::WriteError);
+        }
         current_byte_ = 0;
         bit_pos_ = 0;
     }
@@ -39,7 +44,10 @@ std::expected<void, BitStreamError> BitWriter::WriteBitSequence(std::span<const 
 
             if (bit_pos_ == 8) {
                 out_.put(static_cast<char>(current_byte_));
-                if (out_.fail()) return std::unexpected(BitStreamError::WriteError);
+                if (out_.fail()) {
+                    std::println(stderr, "BitWriter Write Error: {}", error_to_string(BitStreamError::WriteError));
+                    return std::unexpected(BitStreamError::WriteError);
+                }
                 current_byte_ = 0;
                 bit_pos_ = 0;
             }
@@ -60,7 +68,10 @@ std::expected<void, BitStreamError> BitReader::ReadBitSequence(std::span<uint8_t
     while (bits_read < bit_length) {
         if (bit_pos_ == 8) {
             char c;
-            if (!in_.get(c)) return std::unexpected(BitStreamError::EndOfFile);
+            if (!in_.get(c)) {
+                std::println(stderr, "BitReader Read Error: {}", error_to_string(BitStreamError::EndOfFile));
+                return std::unexpected(BitStreamError::EndOfFile);
+            }
             current_byte_ = static_cast<uint8_t>(c);
             bit_pos_ = 0;
         }
@@ -78,6 +89,7 @@ std::expected<void, BitStreamError> BitReader::ReadBitSequence(std::span<uint8_t
             }
         }
         else {
+			std::println(stderr, "BitReader Read Error: {}", error_to_string(BitStreamError::BufferTooSmall));
             return std::unexpected(BitStreamError::BufferTooSmall);
         }
 

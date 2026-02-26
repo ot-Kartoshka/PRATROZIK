@@ -2,12 +2,14 @@
 #include "BWTorMTF.hpp"
 #include <fstream>
 #include <vector>
+#include <iostream>
+#include <print>
 
 std::string_view SplittingError_to_string(SplittingError err) {
     switch (err) {
-	case SplittingError::FileOpenError: return "Помилка відкриття файлу для читання або запису.";
+	case SplittingError::FileOpenError:   return "Помилка відкриття файлу для читання або запису.";
 	case SplittingError::TransformFailed: return "Помилка при застосуванні перетворень BWT/MTF.";
-	default: return "Сталася невідома помилка при роботі з перетвореннями BWT/MTF.";
+	default:                              return "Сталася невідома помилка при роботі з перетвореннями BWT/MTF.";
     }
 }
 
@@ -17,7 +19,10 @@ std::expected<void, SplittingError> TransformSplitting::ApplyForward(
 {
     std::ifstream in(in_path, std::ios::binary);
     std::ofstream out(out_path, std::ios::binary);
-    if (!in || !out) return std::unexpected(SplittingError::FileOpenError);
+    if (!in || !out) {
+        std::println(stderr, "Splitting File Error: {}", SplittingError_to_string(SplittingError::FileOpenError));
+        return std::unexpected(SplittingError::FileOpenError);
+    }
 
     std::vector<uint8_t> buffer(BLOCK_SIZE);
     while (in.read(reinterpret_cast<char*>(buffer.data()), BLOCK_SIZE) || in.gcount() > 0) {
@@ -28,13 +33,19 @@ std::expected<void, SplittingError> TransformSplitting::ApplyForward(
 
         if (use_bwt) {
             auto bwt_res = BWT::Encode(current_span, bwt_index);
-            if (!bwt_res) return std::unexpected(SplittingError::TransformFailed);
+            if (!bwt_res) {
+                std::println(stderr, "BWT Encode Error: {}", TransformError_to_string(bwt_res.error()));
+                return std::unexpected(SplittingError::TransformFailed);
+            }
             transformed = std::move(bwt_res.value());
             current_span = transformed;
         }
         if (use_mtf) {
             auto mtf_res = MTF::Encode(current_span);
-            if (!mtf_res) return std::unexpected(SplittingError::TransformFailed);
+            if (!mtf_res) {
+                std::println(stderr, "MTF Encode Error: {}", TransformError_to_string(mtf_res.error()));
+                return std::unexpected(SplittingError::TransformFailed);
+            }
             transformed = std::move(mtf_res.value());
             current_span = transformed;
         }
@@ -54,7 +65,10 @@ std::expected<void, SplittingError> TransformSplitting::ApplyReverse(
 {
     std::ifstream in(in_path, std::ios::binary);
     std::ofstream out(out_path, std::ios::binary);
-    if (!in || !out) return std::unexpected(SplittingError::FileOpenError);
+    if (!in || !out) {
+        std::println(stderr, "Splitting File Error: {}", SplittingError_to_string(SplittingError::FileOpenError));
+        return std::unexpected(SplittingError::FileOpenError);
+    }
 
     while (in.peek() != EOF) {
         uint32_t block_size = 0;
@@ -73,13 +87,19 @@ std::expected<void, SplittingError> TransformSplitting::ApplyReverse(
 
         if (use_mtf) {
             auto mtf_res = MTF::Decode(current_span);
-            if (!mtf_res) return std::unexpected(SplittingError::TransformFailed);
+            if (!mtf_res) {
+                std::println(stderr, "MTF Decode Error: {}", TransformError_to_string(mtf_res.error()));
+                return std::unexpected(SplittingError::TransformFailed);
+            }
             restored = std::move(mtf_res.value());
             current_span = restored;
         }
         if (use_bwt) {
             auto bwt_res = BWT::Decode(current_span, bwt_index);
-            if (!bwt_res) return std::unexpected(SplittingError::TransformFailed);
+            if (!bwt_res) {
+                std::println(stderr, "BWT Decode Error: {}", TransformError_to_string(bwt_res.error()));
+                return std::unexpected(SplittingError::TransformFailed);
+            }
             restored = std::move(bwt_res.value());
             current_span = restored;
         }
