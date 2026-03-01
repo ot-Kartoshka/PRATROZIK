@@ -277,9 +277,17 @@ std::expected<void, LZWError> LZWCoder::Decompress(
             if (!is_frozen && old_code != EOF_CODE) {
                 dict.push_back({ old_code, first_char });
                 current_code++;
+
                 if (current_code == (1ULL << bit_length) - 1) {
-                    if (bit_length < max_bits) bit_length++;
-                    else if (!clear_on_overflow) is_frozen = true;
+                    if (bit_length < max_bits) {
+                        bit_length++;
+                    }
+                }
+
+                if (current_code == (1ULL << max_bits)) {
+                    if (!clear_on_overflow) {
+                        is_frozen = true;
+                    }
                 }
             }
             old_code = code;
